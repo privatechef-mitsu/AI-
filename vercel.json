@@ -1,0 +1,12 @@
+```json
+{
+  "buildCommand": "npm install",
+  "outputDirectory": "public",
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
+}
+```
