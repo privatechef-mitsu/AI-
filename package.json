@@ -1,0 +1,13 @@
+{
+  "name": "ai-partner-starter-kit",
+  "version": "1.0.0",
+  "private": true,
+  "description": "画面に表示して声で会話できるAI相棒スターターキット",
+  "scripts": {
+    "start": "node server.js",
+    "test": "node --test tests/*.test.js"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
