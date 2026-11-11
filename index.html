@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <title>AI相棒｜音声会話版</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <div class="ambient ambient-one"></div>
+  <div class="ambient ambient-two"></div>
+
+  <main class="app-shell">
+    <header class="topbar">
+      <div class="brand">
+        <span class="brand-mark" aria-hidden="true"></span>
+        <div>
+          <p class="eyebrow">PERSONAL VOICE PARTNER</p>
+          <h1 id="brandName">AI相棒</h1>
+        </div>
+      </div>
+      <div class="top-actions">
+        <span class="connection"><i id="connectionDot"></i><span id="connectionText">準備中</span></span>
+        <button class="icon-button" id="clearButton" type="button" aria-label="会話をリセット">↻</button>
+        <button class="settings-button" id="settingsButton" type="button">設定</button>
+      </div>
+    </header>
+
+    <section class="workspace">
+      <aside class="knowledge-panel panel">
+        <div class="panel-heading">
+          <div>
+            <p class="eyebrow">MEMORY</p>
+            <h2>読み込んだ情報</h2>
+          </div>
+          <button class="mini-button" id="reloadButton" type="button">再読込</button>
+        </div>
+        <div class="memory-summary">
+          <strong id="fileCount">0</strong>
+          <span>FILES READY</span>
+        </div>
+        <ul class="file-list" id="fileList">
+          <li class="muted">確認しています…</li>
+        </ul>
+        <p class="panel-note">knowledgeフォルダの.md / .txtを、会話のたびに読み込みます。</p>
+      </aside>
+
+      <section class="partner-stage" aria-live="polite">
+        <div class="stage-label"><span></span><span id="stageStatus">STANDBY</span><span></span></div>
+        <div class="core-wrap" id="coreWrap">
+          <div class="orbit orbit-a"></div>
+          <div class="orbit orbit-b"></div>
+          <div class="core">
+            <div class="core-glow"></div>
+            <div class="core-center"><span>AI</span></div>
+          </div>
+        </div>
+        <p class="partner-name" id="partnerName">AI相棒</p>
+        <p class="caption" id="caption">準備ができました。話しかけてください。</p>
+        <div class="voice-actions">
+          <button class="mic-button" id="micButton" type="button">
+            <span class="mic-icon" aria-hidden="true">●</span>
+            <span id="micLabel">会話を始める</span>
+          </button>
+          <button class="stop-button" id="stopVoiceButton" type="button">音声を止めて話す</button>
+        </div>
+        <p class="voice-support" id="voiceSupport"></p>
+      </section>
+
+      <aside class="conversation-panel panel">
+        <div class="panel-heading">
+          <div>
+            <p class="eyebrow">SESSION</p>
+            <h2>今日の会話</h2>
+          </div>
+        </div>
+        <div class="messages" id="messages">
+          <article class="message assistant">
+            <span>AI相棒</span>
+            <p>会話モードなら、一度スタートすると話す→返事→また聞く、を繰り返します。</p>
+          </article>
+        </div>
+      </aside>
+    </section>
+
+    <form class="composer" id="composer">
+      <label class="sr-only" for="messageInput">AI相棒へ話しかける</label>
+      <input id="messageInput" name="message" autocomplete="off" placeholder="文字でも話しかけられます" maxlength="2000">
+      <button id="sendButton" type="submit">送信</button>
+    </form>
+    <p class="footer-note">重要な金額・契約・健康・法律の判断は、必ず元資料や専門家にも確認してください。</p>
+  </main>
+
+  <dialog class="settings-dialog" id="settingsDialog">
+    <form method="dialog" class="settings-card" id="settingsForm">
+      <div class="settings-head">
+        <div>
+          <p class="eyebrow">SETUP</p>
+          <h2>AI相棒の設定</h2>
+        </div>
+        <button class="icon-button" id="closeSettingsButton" type="button" aria-label="設定を閉じる">×</button>
+      </div>
+
+      <label>
+        Claude APIキー
+        <input id="apiKeyInput" type="password" autocomplete="off" placeholder="sk-ant-...">
+        <small>この画面を閉じるとブラウザ保存しません。Claudeの回答生成に使います。</small>
+      </label>
+
+      <div class="settings-section">
+        <div class="section-title">
+          <strong>自然音声（ElevenLabs）</strong>
+          <span>未設定時のみMac標準音声を使用。ElevenLabs設定後のエラーは画面に表示</span>
+        </div>
+        <label>
+          ElevenLabs APIキー
+          <input id="elevenApiKeyInput" type="password" autocomplete="off" placeholder="ElevenLabsのAPIキー">
+          <small>APIキーはブラウザ保存しません。音声生成時だけローカルサーバー経由で送信します。</small>
+        </label>
+        <div class="two-column">
+          <label>
+            音声モデル
+            <select id="elevenModelSelect">
+              <option value="eleven_multilingual_v2">Multilingual v2｜日本語の安定性重視（推奨）</option>
+              <option value="eleven_v3">v3｜表現力重視</option>
+              <option value="eleven_flash_v2_5">Flash v2.5｜速度最優先</option>
+              <option value="eleven_v4">v4｜Text to Dialogue向け（この版では非推奨）</option>
+            </select>
+          </label>
+          <label>
+            声を選ぶ
+            <select id="elevenVoiceIdInput">
+              <option value="">先に「利用できる声を読み込む」を押してください</option>
+            </select>
+          </label>
+        </div>
+        <label>
+          Voice IDを直接入力（一覧に出ない場合）
+          <input id="elevenVoiceIdManualInput" type="text" autocomplete="off" placeholder="例: abc123...">
+          <small>ElevenLabsの「My Voices」→対象の声→︙→「Copy voice ID」で取得できます。</small>
+        </label>
+        <div class="voice-action-row">
+          <button class="mini-button voice-load-button" id="loadElevenVoicesButton" type="button">利用できる声を読み込む</button>
+          <button class="mini-button voice-load-button" id="testElevenVoiceButton" type="button">選んだ声をテスト再生</button>
+        </div>
+        <p class="voice-status" id="elevenStatus">新規アカウントでは最初から声が入っていない場合があります。ElevenLabsの「Voices → Explore」で日本語の声を選び、＋でMy Voicesへ保存してから再読込してください。</p>
+      </div>
+
+      <div class="two-column">
+        <label>
+          呼んでほしい名前
+          <input id="ownerNameInput" value="社長" maxlength="40">
+        </label>
+        <label>
+          AI相棒の名前
+          <input id="partnerNameInput" value="AI相棒" maxlength="40">
+        </label>
+      </div>
+      <label>
+        話し方
+        <textarea id="toneInput" rows="3" maxlength="180">自然で親しみがあり、長く付き合っている仕事仲間のように</textarea>
+      </label>
+      <label class="toggle-row">
+        <input id="autoSpeakInput" type="checkbox" checked>
+        <span>AIの回答を自動で読み上げる</span>
+      </label>
+      <label class="toggle-row">
+        <input id="handsFreeInput" type="checkbox" checked>
+        <span>連続会話モード（返答後、自動でまた聞き始める）</span>
+      </label>
+      <label>
+        Mac標準の読み上げ音声（ElevenLabs未設定時）
+        <select id="voiceSelect"><option value="">端末の標準音声</option></select>
+      </label>
+
+      <div class="privacy-box">
+        <strong>利用前に確認</strong>
+        <p>Claude APIとElevenLabs APIは各サービスの利用条件・料金が適用されます。相談内容とknowledgeの情報はClaudeへ、AIの返答文は読み上げ時にElevenLabsへ送信されます。パスワード、カード番号、顧客の個人情報は入れないでください。</p>
+      </div>
+
+      <button class="primary-button" id="saveSettingsButton" value="default">設定を反映する</button>
+    </form>
+  </dialog>
+
+  <script src="/app.js" defer></script>
+</body>
+</html>
